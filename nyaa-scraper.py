@@ -2,11 +2,20 @@
 
 from bs4 import BeautifulSoup as bs
 import requests
-import sys
+import argparse
 import subprocess
 
+parser = argparse.ArgumentParser(description='Nyaa.si cli torrent downloader')
+parser.add_argument('title', help='Title to search')
+parser.add_argument(
+        '-d', '--download', help='Download torrent', action='store_true'
+)
+args = parser.parse_args()
+
+SAVE = args.download
+
 DOMAIN = 'https://nyaa.si'
-URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(sys.argv[1:])
+URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
 FILETYPE = '.torrent'
 
 
@@ -34,6 +43,13 @@ for (i, item) in enumerate(title_list[1:], start=1):
 
 select_input = int(input('\nEnter torrent to download: '))
 torrent_select = torrents[select_input*2]
+if SAVE:
+    torrent_select = torrents[select_input*2-1]
+    title = title_list[select_input]
+    with open(f'{title}.torrent', 'wb') as file:
+        response = requests.get(DOMAIN + torrent_select)
+        file.write(response.content)
+    exit(0)
 
 cmd = "/usr/bin/xdg-open {}".format(torrent_select)
 p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
