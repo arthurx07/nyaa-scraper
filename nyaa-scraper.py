@@ -1,7 +1,6 @@
 #!/bin/env python
 
 from bs4 import BeautifulSoup as bs
-from urllib.parse import unquote  # url decoding
 import requests
 import sys
 import subprocess
@@ -27,7 +26,7 @@ for i in torrents[2::2]:  # return only even indices of a list
     k = j[1]
     k = k.split('&tr=')
     title = k[0]
-    title = unquote(title)
+    title = requests.utils.unquote(title)
     title_list.append(title)
 
 for (i, item) in enumerate(title_list[1:], start=1):
