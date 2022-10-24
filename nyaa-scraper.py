@@ -53,8 +53,3 @@ if SAVE:
 
 cmd = "/usr/bin/xdg-open {}".format(torrent_select)
 p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
-
-# to do:
-# convert filename to readable text --> use a UTF-8 convertor or smth
-# let user decide to download torrent or open magnet
-# implement fzf
