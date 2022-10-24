@@ -35,17 +35,16 @@ for i in torrents[2::2]:  # return only even indices of a list
     title = title.replace('%21', '!')
     title_list.append(title)
 
-for (i, item) in enumerate(title_list, start=0):
+for (i, item) in enumerate(title_list[1:], start=1):
     print(i, item)
 
-select_input = int(input('Enter torrent to download: '))
+select_input = int(input('\nEnter torrent to download: '))
 torrent_select = torrents[select_input*2]
 
 cmd = "/usr/bin/xdg-open {}".format(torrent_select)
 p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
 
 # to do:
-# store received torrents in a list
-# from magnet url, convert filename to readable text
-# let user select which torrent
+# convert filename to readable text --> use a UTF-8 convertor or smth
 # let user decide to download torrent or open magnet
+# implement fzf
