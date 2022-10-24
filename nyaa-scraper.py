@@ -5,10 +5,10 @@ import requests
 import argparse
 import subprocess
 
-parser = argparse.ArgumentParser(description='Nyaa.si cli torrent downloader')
-parser.add_argument('title', help='Title to search')
+parser = argparse.ArgumentParser(description='nyaa.si cli torrent downloader')
+parser.add_argument('title', help='title to search')
 parser.add_argument(
-        '-d', '--download', help='Download torrent', action='store_true'
+        '-d', '--download', help='download torrent', action='store_true'
 )
 args = parser.parse_args()
 
