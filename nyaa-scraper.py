@@ -13,10 +13,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 SAVE = args.download
-
 DOMAIN = 'https://nyaa.si'
 URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
-FILETYPE = '.torrent'
 
 
 def get_soup(url):
@@ -27,7 +25,7 @@ torrents = ['']
 title_list = ['']
 for link in get_soup(URL).find_all('a'):
     file_link = link.get('href')
-    if FILETYPE in file_link:
+    if '.torrent' in file_link:
         torrents.append(file_link)
 
 for i in torrents[2::2]:  # return only even indices of a list
