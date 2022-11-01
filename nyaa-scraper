@@ -9,10 +9,12 @@ parser = argparse.ArgumentParser(description='nyaa.si cli torrent downloader')
 parser.add_argument('title', help='title to search')
 parser.add_argument('-d', '--download', help='download torrent', action='store_true')
 parser.add_argument('-p', '--print', help='print magnet', action='store_true')
+parser.add_argument('-o', '--open', help='program to open magnet', default='$TERMINAL mabel -e') # others: /usr/bin/xdg-open ~ qbittorrent ...
 args = parser.parse_args()
 
 SAVE = args.download
 PRINT = args.print
+OPEN = args.open
 DOMAIN = 'https://nyaa.si'
 URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
 
@@ -53,5 +55,5 @@ if PRINT:
     print(torrent_select)
     exit(0)
 
-cmd = "/usr/bin/xdg-open {}".format(torrent_select)
+cmd = "{} {}".format(OPEN, torrent_select)
 p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
