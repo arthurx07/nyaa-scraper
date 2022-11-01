@@ -7,12 +7,12 @@ import subprocess
 
 parser = argparse.ArgumentParser(description='nyaa.si cli torrent downloader')
 parser.add_argument('title', help='title to search')
-parser.add_argument(
-        '-d', '--download', help='download torrent', action='store_true'
-)
+parser.add_argument('-d', '--download', help='download torrent', action='store_true')
+parser.add_argument('-p', '--print', help='print magnet', action='store_true')
 args = parser.parse_args()
 
 SAVE = args.download
+PRINT = args.print
 DOMAIN = 'https://nyaa.si'
 URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
 
@@ -47,6 +47,10 @@ if SAVE:
     with open(f'{title}.torrent', 'wb') as file:
         response = requests.get(DOMAIN + torrent_select)
         file.write(response.content)
+    exit(0)
+
+if PRINT:
+    print(torrent_select)
     exit(0)
 
 cmd = "/usr/bin/xdg-open {}".format(torrent_select)
