@@ -27,7 +27,9 @@ torrents = ['']
 title_list = ['']
 for link in get_soup(URL).find_all('a'):
     file_link = link.get('href')
-    if '.torrent' in file_link:
+    if file_link is None:
+        pass
+    elif '.torrent' in file_link:
         torrents.append(file_link)
 
 for i in torrents[2::2]:  # return only even indices of a list
