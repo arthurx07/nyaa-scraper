@@ -10,6 +10,7 @@ parser.add_argument('title', help='title to search')
 parser.add_argument('-d', '--download', help='download torrent', action='store_true')
 parser.add_argument('-p', '--print', help='print magnet', action='store_true')
 parser.add_argument('-o', '--open', help='program to open magnet', default='$TERMINAL mabel -e') # others: /usr/bin/xdg-open ~ qbittorrent ...
+parser.add_argument('-i', '--input', help='select torrent number from list')
 args = parser.parse_args()
 
 SAVE = args.download
@@ -43,7 +44,10 @@ for i in torrents[2::2]:  # return only even indices of a list
 for (i, item) in enumerate(title_list[1:], start=1):
     print(i, item)
 
-select_input = int(input('\nEnter torrent to download: '))
+if args.input is not None:
+    select_input = int(args.input)
+else:
+    select_input = int(input('\nEnter torrent to download: '))
 torrent_select = torrents[select_input*2]
 if SAVE:
     torrent_select = torrents[select_input*2-1]
