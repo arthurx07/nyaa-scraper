@@ -1,0 +1,62 @@
+#!/bin/env python
+
+## TODO:
+# batch mode, where you input show + episodes, and then the program recursively runs letting you decide which torrents to download
+# convert $HOME to /home/kumao/
+
+from bs4 import BeautifulSoup as bs
+import requests
+import argparse
+import subprocess
+import os
+import signal
+from time import sleep
+
+parser = argparse.ArgumentParser(prog='nyaa-scraper', description='nyaa.si cli torrent downloader')
+parser.add_argument('title', help='title to search')
+parser.add_argument('-e', '--episode', help='specify episode to watch (all|1|6-12|-1)', default='all', metavar='')
+parser.add_argument('-q', '--quality', help='set video quality (best|worst|360|480|720|1080|1440|3840|4k)', default='1080p', metavar='')
+parser.add_argument('-l', '--language', help='set subtitle language (SPA|ES|ENG|SPA-LA|FRE|GER|etc.)', default='SPA', metavar='')
+parser.add_argument('-u', '--user', help='set torrent user provider (Erai-raws|DantalianSubs|PuyaSubs!|CameEsp|Ohys-Raws|etc.)', default='Erai-raws', metavar='')
+parser.add_argument('-p', '--path', help='specify directory to save anime', default='/home/kumao/src/anime', metavar='')
+parser.add_argument('-s', '--save', help='download torrent', action='store_true')
+parser.add_argument('-x', '--print', help='print magnet', action='store_true')
+parser.add_argument('-o', '--open', help='program to open magnet', default='/usr/bin/xdg-open', metavar='')
+parser.add_argument('-i', '--input', help='select torrent number from list', metavar='')
+args = parser.parse_args()
+
+TITLE = args.title
+episode = args.episode
+QUALITY = args.quality
+LANGUAGE = args.language
+USER = args.user
+PATH = args.path
+SAVE = args.save
+PRINT = args.print
+OPEN = args.open
+DOMAIN = 'https://nyaa.si/'
+nyaa_search = '&q='
+nyaa_filter = 'f=0'
+nyaa_category = 'c=0_0'
+# URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
+NYAA_RSS = '?page=rss' + nyaa_search
+TORRENT_RSS = DOMAIN + NYAA_RSS + USER + '+' + TITLE.replace(' ', '+') + '+' + QUALITY + '+' + LANGUAGE + '&' + nyaa_category + '&' + nyaa_filter
+transmission_rss = '/usr/bin/transmission-rss'
+
+if len(episode) == 1:
+    episode = '0' + episode 
+
+if episode == 'all':
+    with open(f'/home/kumao/.config/transmission-rss/config.yml', 'a') as file:
+        file.write('\n\n  - url: ' + TORRENT_RSS + '\n    download_path: ' + PATH)
+
+    pro = subprocess.Popen([transmission_rss, '-s'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+    sleep(2)
+    os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
+
+# elif '-' in episode:
+    # batch_download = True
+# elif episode == '-1':
+    # latest_ep = True
+# elif episode == 'all': #?
+    # anime_complete = True #?

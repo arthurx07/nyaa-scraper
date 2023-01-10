@@ -1,0 +1,8 @@
+1. classify as episodes
+2. if one ep., download torrent as before
+3. if mult eps., download one by one torrents as before
+4. if all, add to tsm-rss
+5. if latest, download torrent as before only latest one
+
+6. if no results, repeat everything but asking user input
+	-> show list (as before)
