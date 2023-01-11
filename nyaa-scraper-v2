@@ -16,37 +16,63 @@ parser = argparse.ArgumentParser(prog='nyaa-scraper', description='nyaa.si cli t
 parser.add_argument('title', help='title to search')
 parser.add_argument('-e', '--episode', help='specify episode to watch (all|1|6-12|-1)', default='all', metavar='')
 parser.add_argument('-q', '--quality', help='set video quality (best|worst|360|480|720|1080|1440|3840|4k)', default='1080p', metavar='')
-parser.add_argument('-l', '--language', help='set subtitle language (SPA|ES|ENG|SPA-LA|FRE|GER|etc.)', default='SPA', metavar='')
+parser.add_argument('-g', '--language', help='set subtitle language (SPA|ES|ENG|SPA-LA|FRE|GER|etc.)', default='SPA', metavar='')
 parser.add_argument('-u', '--user', help='set torrent user provider (Erai-raws|DantalianSubs|PuyaSubs!|CameEsp|Ohys-Raws|etc.)', default='Erai-raws', metavar='')
 parser.add_argument('-p', '--path', help='specify directory to save anime', default='/home/kumao/src/anime', metavar='')
 parser.add_argument('-s', '--save', help='download torrent', action='store_true')
 parser.add_argument('-x', '--print', help='print magnet', action='store_true')
 parser.add_argument('-o', '--open', help='program to open magnet', default='/usr/bin/xdg-open', metavar='')
+parser.add_argument('-l', '--list', help='list all available torrents and exit', metavar='')
 parser.add_argument('-i', '--input', help='select torrent number from list', metavar='')
 args = parser.parse_args()
 
-TITLE = args.title
+# title, episode, quality, language, user, path, save, print, open, list, input
 episode = args.episode
-QUALITY = args.quality
-LANGUAGE = args.language
-USER = args.user
-PATH = args.path
-SAVE = args.save
-PRINT = args.print
-OPEN = args.open
-DOMAIN = 'https://nyaa.si/'
+domain = 'https://nyaa.si/'
 nyaa_search = '&q='
 nyaa_filter = 'f=0'
 nyaa_category = 'c=0_0'
-# URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(args.title)
-NYAA_RSS = '?page=rss' + nyaa_search
-TORRENT_RSS = DOMAIN + NYAA_RSS + USER + '+' + TITLE.replace(' ', '+') + '+' + QUALITY + '+' + LANGUAGE + '&' + nyaa_category + '&' + nyaa_filter
-transmission_rss = '/usr/bin/transmission-rss'
 
-if len(episode) == 1:
-    episode = '0' + episode 
+def get_soup(url):
+    return bs(requests.get(url).text, 'html.parser') # parse url as html
+
+def get_torrent_magnet():
+    torrents = ['']
+    for link in get_soup(ep_url).find_all('a'): # for each link in every <a> parsed from html
+        file_link = link.get('href') # get href from link
+        if file_link is None: # if not href, pass
+            pass
+        elif '.torrent' in file_link: # if '.torrent', append file_link
+            torrents.append(file_link)
+    return torrents
+
+def get_title():
+    title_list = ['']
+    for i in get_torrent_magnet()[2::2]: # return only even indicates of a list
+        j = i.replace('&dn=', '&tr=').split('&tr=') # replace &dn= with &tr=, then split for every &tr=
+        title = requests.utils.unquote(j[1]) # format to legible text, j[1] is title pos. in list j
+        title_list.append(title) # append title to title list
+    return title_list
+
+def torrent_save():
+    torrent_select = get_torrent_magnet()[1]
+    format_title = get_title()[1]
+    with open(f'/home/kumao/tmp/{title}.torrent', 'wb') as file:
+        response = requests.get(domain + torrent_select)
+        file.write(response.content)
+
+def magnet_print():
+    print(torrent_select)
+
+def list_titles():
+    for (i, item) in enumerate(title_list[1:], start =1): # start from title_list n1, enumerate from 1
+        print(i, '. ' + item, sep='') # print i (index) and item (title)
 
 if episode == 'all':
+    nyaa_rss = '?page=rss' + nyaa_search
+    transmission_rss = '/usr/bin/transmission-rss'
+    title = (f'{args.user}+{args.title.replace(" ", "+")}+{args.quality}+{args.language}')
+    rss_name = (f'{domain}{nyaa_rss}{title}&{nyaa_category}&{nyaa_filter}')
     with open(f'/home/kumao/.config/transmission-rss/config.yml', 'a') as file:
         file.write('\n\n  - url: ' + TORRENT_RSS + '\n    download_path: ' + PATH)
 
@@ -54,9 +80,60 @@ if episode == 'all':
     sleep(2)
     os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
 
-# elif '-' in episode:
-    # batch_download = True
-# elif episode == '-1':
-    # latest_ep = True
-# elif episode == 'all': #?
-    # anime_complete = True #?
+elif len(episode) == 1:
+    episode = '0' + episode 
+    title = (f'{args.user} {args.title} {episode} {args.quality} {args.language}')
+    ep_url = (f'{domain}?{nyaa_filter}&{nyaa_category}{nyaa_search}{title}')
+    get_torrent_magnet()
+    torrent_select = get_torrent_magnet()[2]
+    format_title = get_title()[1]
+    print(format_title)
+    print(torrent_select)
+    if args.list:
+        list_titles()
+
+elif '-' in episode and len(episode) >= 3:
+    episode_last = int(episode.split('-')[1])
+    episode = int(episode.split('-')[0])
+
+    while episode <= episode_last:
+        if len(str(episode)) == 1:
+            episode = '0' + str(episode)
+        title = (f'{args.user} {args.title} {episode} {args.quality} {args.language}')
+        ep_url = (f'{domain}?{nyaa_filter}&{nyaa_category}{nyaa_search}{title}')
+        get_torrent_magnet()
+        torrent_select = get_torrent_magnet()[2]
+        format_title = get_title()[1]
+        print(format_title)
+        print(torrent_select)
+        if args.save:
+            torrent_save()
+
+        # episode_download
+        # pro = subprocess.Popen(f'{args.open} {torrent_select}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # add torrent to torrent-manager
+
+        episode = int(episode) + 1 # episode += 1
+
+elif episode == '-1':
+    title = (f'{args.user} {args.title} {args.quality} {args.language}')
+    ep_url = (f'{domain}?{nyaa_filter}&{nyaa_category}{nyaa_search}{title}')
+    get_torrent_magnet()
+    torrent_select = get_torrent_magnet()[2]
+    format_title = get_title()[1]
+    print(format_title)
+    print(torrent_select)
+
+elif args.list:
+    ## print torrent list
+    for (i, item) in enumerate(title_list[1:], start =1): # start from title_list n1, enumerate from 1
+        print(i, '. ' + item, sep='') # print i (index) and item (title)
+
+## select torrent from list
+# if args.input is not None:
+    # select_input = int(args.input) # use user input from args
+# else:
+    # select_input = int(input('\nEnter torrent to download: ')) # ask for user input
+# torrent_select = torrents[select_input*2]
+
+
+# pro = subprocess.Popen(f'{args.open} {torrent_select}', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # add torrent to torrent-manager

@@ -1,0 +1,62 @@
+#!/bin/env python
+
+from bs4 import BeautifulSoup as bs
+import requests
+import argparse
+import subprocess
+
+title = "Erai-Raws Ijiranaide, Nagatoro-san 2nd Attack"
+DOMAIN = 'https://nyaa.si'
+URL = 'https://nyaa.si/?f=0&c=0_0&q='+''.join(title)
+
+def get_soup(url):
+    return bs(requests.get(url).text, 'html.parser') # parse url as html
+
+# print(get_soup(URL)) # html all page url
+# print(get_soup(URL).find_all('a')) # only <a>
+
+torrents = ['']
+title_list = ['']
+
+## get torrent magnet
+for link in get_soup(URL).find_all('a'): # for each link in every <a> parsed from html
+    file_link = link.get('href') # get href from link
+    if file_link is None: # if not href, pass
+        pass
+    elif '.torrent' in file_link: # if '.torrent', append file_link
+        # print(file_link)
+        torrents.append(file_link) # append torrent link to torrent list
+print(torrents)
+
+## get torrent list
+for i in torrents[2::2]: # return only even indicates of a list
+    j = i.replace('&dn=', '&tr=').split('&tr=') # replace &dn= with &tr=, then split for every &tr=
+    # print(j)
+    title = requests.utils.unquote(j[1]) # format to legible text, j[1] is title pos. in list j
+    # print(title)
+    title_list.append(title) # append title to title list
+
+## print torrent list
+for (i, item) in enumerate(title_list[1:], start =1): # start from title_list n1, enumerate from 1
+    print(i, '. ' + item, sep='') # print i (index) and item (title)
+
+## select torrent from list
+if args.input is not None:
+    select_input = int(args.input) # use user input from args
+else:
+    select_input = int(input('\nEnter torrent to download: ')) # ask for user input
+torrent_select = torrents[select_input*2]
+
+## save torrent file
+if SAVE:
+    torrent_select = torrents[select_input*2-1] # don't get magnet, get torrent url
+    title = title_list[select_input]
+    with open(f'{title}.torrent', 'wb') as file:
+        response = requests.get(DOMAIN + torrent_select)
+        file.write(response.content)
+
+if PRINT:
+    print(torrent_select)
+
+cmd = "{} {}".format(OPEN, torrent_select)
+p = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
