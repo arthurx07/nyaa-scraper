@@ -19,7 +19,7 @@ parser.add_argument('-s', '--save', help='download torrent', action='store_true'
 parser.add_argument('-x', '--print', help='print magnet', action='store_true')
 parser.add_argument('-o', '--open', help='program to open magnet', default='/usr/bin/transmission-remote -a', metavar='') # /usr/bin/xdg-open
 parser.add_argument('-l', '--list', help='list all available torrents and exit', action='store_true')
-parser.add_argument('-i', '--input', help='select torrent number from list')
+parser.add_argument('-i', '--input', help='select torrent number from list', metavar='')
 args = parser.parse_args()
 
 # title, episode, quality, language, user, path, save, print, open, list, input
@@ -86,7 +86,7 @@ if episode == 'all':
     title = (f'{args.user}+{args.title.replace(" ", "+")}+{args.quality}+{args.language}')
     rss_name = (f'{domain}{nyaa_rss}{title}&{nyaa_category}&{nyaa_filter}')
     with open(f'{os.path.expanduser("~")}/.config/transmission-rss/config.yml', 'a') as file:
-        file.write(f'\n\n   - url: {rss_name}\n    download_path: {args.path}')
+        file.write(f'\n\n  - url: {rss_name}\n  download_path: {args.path}')
 
     pro = subprocess.Popen([transmission_rss, '-s'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
     sleep(2)
