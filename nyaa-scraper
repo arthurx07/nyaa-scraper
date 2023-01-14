@@ -86,7 +86,7 @@ if episode == 'all':
     title = (f'{args.user}+{args.title.replace(" ", "+")}+{args.quality}+{args.language}')
     rss_name = (f'{domain}{nyaa_rss}{title}&{nyaa_category}&{nyaa_filter}')
     with open(f'{os.path.expanduser("~")}/.config/transmission-rss/config.yml', 'a') as file:
-        file.write(f'\n\n  - url: {rss_name}\n  download_path: {args.path}')
+        file.write(f'\n\n   - url: {rss_name}\n     download_path: {args.path}')
 
     pro = subprocess.Popen([transmission_rss, '-s'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
     sleep(2)
