@@ -16,7 +16,7 @@ parser.add_argument('-q', '--quality', help='set video quality (best|worst|360|4
 parser.add_argument('-g', '--language', help='set subtitle language (SPA|ES|ENG|SPA-LA|FRE|GER|etc.)', default='SPA', metavar='')
 parser.add_argument('-u', '--user', help='set torrent user provider (Erai-raws|DantalianSubs|PuyaSubs!|CameEsp|Ohys-Raws|etc.)', default='Erai-raws', metavar='')
 parser.add_argument('-p', '--path', help='specify directory to save anime', default=os.path.expanduser('~/src/anime'), metavar='')
-parser.add_argument('-s', '--save', help='download torrent', action='store_true')
+parser.add_argument('-s', '--save', help='download torrent file', action='store_true')
 parser.add_argument('-x', '--print', help='print magnet', action='store_true')
 parser.add_argument('-o', '--open', help='program to open magnet', default='/usr/bin/transmission-remote -a', metavar='') # /usr/bin/xdg-open
 parser.add_argument('-l', '--list', help='list all available torrents and exit', action='store_true')
@@ -25,6 +25,7 @@ args = parser.parse_args()
 
 # title, episode, quality, language, user, path, save, print, open, list, input
 episode = args.episode
+transmission_path = '--download-dir {}'.format(args.path)
 domain = 'https://nyaa.si/'
 nyaa_search = '&q='
 nyaa_filter = 'f=0'
@@ -76,7 +77,7 @@ def download_torrent():
     if args.save:
         torrent_save()
 
-    pro = subprocess.Popen(f'{args.open} "{torrent_select}"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) # add torrent to torrent-manager
+    pro = subprocess.Popen(f'{args.open} {transmission_path} "{torrent_select}"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) # add torrent to torrent-manager
 
 if args.rss:
     nyaa_rss = '?page=rss' + nyaa_search
@@ -128,7 +129,7 @@ elif args.list: # print torrent list // select one from list
             magnet_print()
         if args.save:
             torrent_save()
-        pro = subprocess.Popen(f'{args.open} "{torrent_select}"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) # add torrent to torrent-manager
+        pro = subprocess.Popen(f'{args.open} {transmission_path} "{torrent_select}"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True) # add torrent to torrent-manager
 
     exit(0)
 
