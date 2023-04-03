@@ -2,8 +2,6 @@
 
 # TODO:
 # enter desired episode by selecting (01,07) // will download eps. 01 and 07
-# watch mode -> watch ep. when finished download (syncplay integration?)
-# show rss -> output all tracking episodes
 
 from bs4 import BeautifulSoup as bs
 import os
@@ -40,10 +38,6 @@ nyaa_category = 'c=0_0'
 
 # if ',' in episode; split and assign ep_1, ep_2,.. to each episode
 # while loop to download each episode
-
-# if show rss, cat .config/transmission_rss/config.yml -> get titles with regex and output to terminal
-
-# watch mode -> do not develop feature
 
 def get_soup(url):
     return bs(requests.get(url).text, 'html.parser') # parse url as html
