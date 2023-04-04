@@ -86,9 +86,9 @@ if args.rss:
     rss_name = (f'{domain}{nyaa_rss}{title}&{nyaa_category}&{nyaa_filter}')
     with open(f'{os.path.expanduser("~")}/.config/transmission-rss/config.yml', 'a') as file:
         file.write(f'\n\n   - url: {rss_name}\n     download_path: {args.path}')
-    print(f'{title} has been added to transmission_rss.')
+    print(f'{title} has been added to transmission-rss.')
 
-    pro = subprocess.Popen(['transmission-rss', '-s'], cwd='/', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # , preexec_fn=os.setsid)
+    pro = subprocess.Popen([transmission_rss, '-s'], cwd='/', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # , preexec_fn=os.setsid)
     pro2 = subprocess.Popen('sleep 30 && pkill -f "transmission-rss -s"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     # sleep(2)
     # os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
