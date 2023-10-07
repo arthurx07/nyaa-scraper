@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 from bs4 import BeautifulSoup as bs
 import os
@@ -15,7 +15,7 @@ parser.add_argument('-r', '--rss', help='track anime with transmission-rss', act
 parser.add_argument('-q', '--quality', help='set video quality (best|worst|360|480|720|1080|1440|3840|4k)', default='1080p', metavar='')
 parser.add_argument('-g', '--language', help='set subtitle language (SPA|ES|ENG|SPA-LA|FRE|GER|etc.)', default='SPA', metavar='')
 parser.add_argument('-u', '--user', help='set torrent user provider (Erai-raws|DantalianSubs|PuyaSubs!|CameEsp|Ohys-Raws|etc.)', default='Erai-raws', metavar='')
-parser.add_argument('-p', '--path', help='specify directory to save anime', default=os.path.expanduser('~/src/anime'), metavar='')
+parser.add_argument('-p', '--path', help='specify directory to save anime', default=os.path.expanduser('/var/lib/transmission/downloads'), metavar='')
 parser.add_argument('-s', '--save', help='download torrent file', action='store_true')
 parser.add_argument('-x', '--print', help='print magnet', action='store_true')
 parser.add_argument('-o', '--open', help='program to open magnet', default='/usr/bin/transmission-remote -a', metavar='') # /usr/bin/xdg-open
